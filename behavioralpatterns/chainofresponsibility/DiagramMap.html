@@ -43,11 +43,11 @@ The JavaScript code except the D3, Popper, and Tippy library in this file is und
     </style>
 
     <style>
-        .checkbox {
+        .checkbox-pc {
             display: none;
         }
 
-        .toggle {
+        .toggle-pc {
             position: absolute;
             left: 20px;
             top: 130px;
@@ -58,7 +58,7 @@ The JavaScript code except the D3, Popper, and Tippy library in this file is und
             z-index: 3;
         }
 
-        .toggle:after {
+        .toggle-pc:after {
             content: '';
             position: absolute;
             top: 2px;
@@ -70,17 +70,45 @@ The JavaScript code except the D3, Popper, and Tippy library in this file is und
             transition: 0.2s;
         }
 
-        .checkbox:checked + .toggle:after {
+        .checkbox-pc:checked + .toggle-pc:after {
             left: 12px;
+        }
+
+        .checkbox-tab {
+            display: none;
+        }
+
+        .toggle-tab {
+            position: absolute;
+            left: 20px;
+            top: 250px;
+            width: 150px;
+            height: 100px;
+            display: block;
+            border-radius: 100px;
+            z-index: 3;
+        }
+
+        .toggle-tab:after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .checkbox-tab:checked + .toggle-tab:after {
+            left: 60px;
         }
 
         button {
             position: absolute;
             left: 20px;
             top: 20px;
-            width: 30px;
-            height: 30px;
-            font-size: 15px;
             background-color: white;
             border-width: 1px;
             z-index: 2;
@@ -313,162 +341,250 @@ The JavaScript code except the D3, Popper, and Tippy library in this file is und
             }
         }
 
-        // Create Zoom In button
-        d3.select('body')
-            .append('button')
-            .text('＋')
-            .style('margin-top', '0px')
-            .style('padding', '0px')
-            .on('mouseover', function(){
-                d3.select(this).style('background-color', '#eeeeee');
-            })
-            .on('mouseout', function(){
-                d3.select(this).style('background-color', '#ffffff');
-            })
-            .on('click', function(){
-                zoom.scaleBy(svg.transition().duration(250), 1.5);
-            });
+        var ua = navigator.userAgent;
+        if (ua.indexOf('iPhone') > 0
+            || ua.indexOf('iPod') > 0
+            || ua.indexOf('Android') > 0
+            || ua.indexOf('Windows Phone') > 0
+            || ua.indexOf('iPad') > 0) {
+            // Mobile or Tablet
 
-        // Create Zoom Out button
-        d3.select('body')
-            .append('button')
-            .text('－')
-            .style('margin-top', '32px')
-            .style('padding', '0px')
-            .on('mouseover', function(){
-                d3.select(this).style('background-color', '#eeeeee');
-            })
-            .on('mouseout', function(){
-                d3.select(this).style('background-color', '#ffffff');
-            })
-            .on('click', function(){
-                zoom.scaleBy(svg.transition().duration(250), 0.75);
-            });
+            // Create Zoom Fit button
+            d3.select('body')
+                .append('button')
+                .text('Fit')
+                .attr('id', 'fit-button')
+                .style('width', '150px')
+                .style('height', '150px')
+                .style('font-size', '75px')
+                .style('margin-top', '0px')
+                .style('padding', '0px')
+                .on('mouseover', function(){
+                    d3.select(this).style('background-color', '#eeeeee');
+                })
+                .on('mouseout', function(){
+                    d3.select(this).style('background-color', '#ffffff');
+                })
+                .on('click', function(){
+                    let diagramsWidth = jsonData.size.width;
+                    let diagramsHeight = jsonData.size.height;
+                    let scale = Math.min(windowWidth / diagramsWidth, windowHeight / diagramsHeight);
+                    scale = Math.max(scale, MINIMUM_SCALE);     // Do not allow less than minimum
+                    scale = Math.min(scale, MAXIMUM_SCALE);     // Do not allow greater than maximum
 
-        // Create Zoom Fit button
-        d3.select('body')
-            .append('button')
-            .text('Fit')
-            .attr('id', 'fit-button')
-            .style('margin-top', '64px')
-            .style('padding', '0px')
-            .on('mouseover', function(){
-                d3.select(this).style('background-color', '#eeeeee');
-            })
-            .on('mouseout', function(){
-                d3.select(this).style('background-color', '#ffffff');
-            })
-            .on('click', function(){
-                let diagramsWidth = jsonData.size.width;
-                let diagramsHeight = jsonData.size.height;
-                let scale = Math.min(windowWidth / diagramsWidth, windowHeight / diagramsHeight);
-                scale = Math.max(scale, MINIMUM_SCALE);     // Do not allow less than minimum
-                scale = Math.min(scale, MAXIMUM_SCALE);     // Do not allow greater than maximum
+                    // Move center of diagrams to center of window and scale
+                    let centerXofDiagrams = diagramsWidth * scale * 0.5;
+                    let centerYofDiagrams = diagramsHeight * scale * 0.5;
+                    let centerXofBrowser = windowWidth * 0.5;
+                    let centerYofBrowser = windowHeight * 0.5;
+                    svg.transition().duration(750).ease(d3.easeSinOut).call(zoom.transform, d3.zoomIdentity
+                        .translate(centerXofBrowser - centerXofDiagrams, centerYofBrowser - centerYofDiagrams)
+                        .scale(scale));
+                });
 
-                // Move center of diagrams to center of window and scale
-                let centerXofDiagrams = diagramsWidth * scale * 0.5;
-                let centerYofDiagrams = diagramsHeight * scale * 0.5;
-                let centerXofBrowser = windowWidth * 0.5;
-                let centerYofBrowser = windowHeight * 0.5;
-                svg.transition().duration(750).ease(d3.easeSinOut).call(zoom.transform, d3.zoomIdentity
-                    .translate(centerXofBrowser - centerXofDiagrams, centerYofBrowser - centerYofDiagrams)
-                    .scale(scale));
-            });
+            // Create Show/Hide toggle button
+            d3.select('body')
+                .append('input')
+                .attr('type', 'checkbox')
+                .attr('id', 'switch-tab')
+                .attr('class', 'checkbox-tab')
+                .attr('checked', true)
+                .on('change', function(){
+                    if (this.checked) {
+                        // Show highlights
+                        svg.select('#front-layer')
+                            .attr('visibility', 'visible');
 
-        // Description of the toggle button
-        let desc = 'Show/Hide Highlights and Hyperlinks';
+                        // Change toggle background color
+                        d3.select('.toggle-tab')
+                            .style('background', HIGHLIGHT_COLOR);
+                    } else {
+                        // Hide highlights
+                        svg.select('#front-layer')
+                            .attr('visibility', 'hidden');
 
-        // Temporarily create a description and get the text length
-        let tmpDesc = svg.append('text')
-            .attr('font-family', 'sans-serif')
-            .attr('font-size', '16px')
-            .text(desc);
-        let descWidth = tmpDesc.node().getComputedTextLength();
-        tmpDesc.remove();
+                        // Change toggle background color
+                        d3.select('.toggle-tab')
+                            .style('background', 'silver');
+                    }
+                });
+            
+            // Create Show/Hide toggle button label
+            d3.select('body')
+                .append('label')
+                .attr('for', 'switch-tab')
+                .attr('class', 'toggle-tab')
+                .style('background', HIGHLIGHT_COLOR);
 
-        // Create a path using the text length
-        svg.append('path')
-            .attr('id', 'path')
-            .attr('d', 'M 0 16 L ' + descWidth + ' 16')
-            .style("stroke-width", 0)
-            .attr('transform', 'translate(55,130)');
+        }else {
+            // PC
 
-        // Create a rectangle behind the description
-        let btnDescRect = svg.append('rect')
-            .attr('width', 0)
-            .attr('height', 22)
-            .attr('fill', '#ffffff')
-            .attr("stroke-width", 0)
-            .attr('transform', 'translate(55,130)');
+            // Create Zoom In button
+            d3.select('body')
+                .append('button')
+                .text('＋')
+                .style('width', '30px')
+                .style('height', '30px')
+                .style('font-size', '15px')
+                .style('margin-top', '0px')
+                .style('padding', '0px')
+                .on('mouseover', function(){
+                    d3.select(this).style('background-color', '#eeeeee');
+                })
+                .on('mouseout', function(){
+                    d3.select(this).style('background-color', '#ffffff');
+                })
+                .on('click', function(){
+                    zoom.scaleBy(svg.transition().duration(250), 1.5);
+                });
 
-        // Create a description and set the path
-        let btnDesc = svg.append('text')
-            .append('textPath')
-            .attr('xlink:href', '#path')
-            .attr('startOffset', -descWidth)
-            .attr('font-family', 'sans-serif')
-            .attr('font-size', '16px')
-            .attr('fill', '#555555')
-            .attr('stroke-width', 0)
-            .text(desc);
+            // Create Zoom Out button
+            d3.select('body')
+                .append('button')
+                .text('－')
+                .style('width', '30px')
+                .style('height', '30px')
+                .style('font-size', '15px')
+                .style('margin-top', '32px')
+                .style('padding', '0px')
+                .on('mouseover', function(){
+                    d3.select(this).style('background-color', '#eeeeee');
+                })
+                .on('mouseout', function(){
+                    d3.select(this).style('background-color', '#ffffff');
+                })
+                .on('click', function(){
+                    zoom.scaleBy(svg.transition().duration(250), 0.75);
+                });
 
-        // Create Show/Hide toggle button
-        d3.select('body')
-            .append('input')
-            .attr('type', 'checkbox')
-            .attr('id', 'switch')
-            .attr('class', 'checkbox')
-            .attr('checked', true)
-            .on('change', function(){
-                if (this.checked) {
-                    // Show highlights
-                    svg.select('#front-layer')
-                        .attr('visibility', 'visible');
+            // Create Zoom Fit button
+            d3.select('body')
+                .append('button')
+                .text('Fit')
+                .attr('id', 'fit-button')
+                .style('width', '30px')
+                .style('height', '30px')
+                .style('font-size', '15px')
+                .style('margin-top', '64px')
+                .style('padding', '0px')
+                .on('mouseover', function(){
+                    d3.select(this).style('background-color', '#eeeeee');
+                })
+                .on('mouseout', function(){
+                    d3.select(this).style('background-color', '#ffffff');
+                })
+                .on('click', function(){
+                    let diagramsWidth = jsonData.size.width;
+                    let diagramsHeight = jsonData.size.height;
+                    let scale = Math.min(windowWidth / diagramsWidth, windowHeight / diagramsHeight);
+                    scale = Math.max(scale, MINIMUM_SCALE);     // Do not allow less than minimum
+                    scale = Math.min(scale, MAXIMUM_SCALE);     // Do not allow greater than maximum
 
-                    // Change toggle background color
-                    d3.select('.toggle')
-                        .style('background', HIGHLIGHT_COLOR);
-                } else {
-                    // Hide highlights
-                    svg.select('#front-layer')
-                        .attr('visibility', 'hidden');
+                    // Move center of diagrams to center of window and scale
+                    let centerXofDiagrams = diagramsWidth * scale * 0.5;
+                    let centerYofDiagrams = diagramsHeight * scale * 0.5;
+                    let centerXofBrowser = windowWidth * 0.5;
+                    let centerYofBrowser = windowHeight * 0.5;
+                    svg.transition().duration(750).ease(d3.easeSinOut).call(zoom.transform, d3.zoomIdentity
+                        .translate(centerXofBrowser - centerXofDiagrams, centerYofBrowser - centerYofDiagrams)
+                        .scale(scale));
+                });
 
-                    // Change toggle background color
-                    d3.select('.toggle')
-                        .style('background', 'silver');
-                }
-            });
-        
-        // Create Show/Hide toggle button label
-        d3.select('body')
-            .append('label')
-            .attr('for', 'switch')
-            .attr('class', 'toggle')
-            .style('background', HIGHLIGHT_COLOR)
-            .on('mouseover', function(){
-                // Show the description and the rectangle behind it
-                btnDesc.transition()
-                    .duration(300)
-                    .ease(d3.easeExpOut)
-                    .attr('startOffset', 0);
-                
-                btnDescRect.transition()
-                    .duration(300)
-                    .ease(d3.easeExpOut)
-                    .attr('width', descWidth);
-            })
-            .on('mouseout', function(){
-                // Hide the description and the rectangle behind it
-                btnDesc.transition()
-                    .duration(300)
-                    .ease(d3.easeExpOut)
-                    .attr('startOffset', -descWidth);
+            // Description of the toggle button
+            let desc = 'Show/Hide Highlights and Hyperlinks';
 
-                btnDescRect.transition()
-                    .duration(300)
-                    .ease(d3.easeExpOut)
-                    .attr('width', 0);
-            });
+            // Temporarily create a description and get the text length
+            let tmpDesc = svg.append('text')
+                .attr('font-family', 'sans-serif')
+                .attr('font-size', '16px')
+                .text(desc);
+            let descWidth = tmpDesc.node().getComputedTextLength();
+            tmpDesc.remove();
+
+            // Create a path using the text length
+            svg.append('path')
+                .attr('id', 'path')
+                .attr('d', 'M 0 16 L ' + descWidth + ' 16')
+                .style("stroke-width", 0)
+                .attr('transform', 'translate(55,130)');
+
+            // Create a rectangle behind the description
+            let btnDescRect = svg.append('rect')
+                .attr('width', 0)
+                .attr('height', 22)
+                .attr('fill', '#ffffff')
+                .attr("stroke-width", 0)
+                .attr('transform', 'translate(55,130)');
+
+            // Create a description and set the path
+            let btnDesc = svg.append('text')
+                .append('textPath')
+                .attr('xlink:href', '#path')
+                .attr('startOffset', -descWidth)
+                .attr('font-family', 'sans-serif')
+                .attr('font-size', '16px')
+                .attr('fill', '#555555')
+                .attr('stroke-width', 0)
+                .text(desc);
+
+            // Create Show/Hide toggle button
+            d3.select('body')
+                .append('input')
+                .attr('type', 'checkbox')
+                .attr('id', 'switch-pc')
+                .attr('class', 'checkbox-pc')
+                .attr('checked', true)
+                .on('change', function(){
+                    if (this.checked) {
+                        // Show highlights
+                        svg.select('#front-layer')
+                            .attr('visibility', 'visible');
+
+                        // Change toggle background color
+                        d3.select('.toggle-pc')
+                            .style('background', HIGHLIGHT_COLOR);
+                    } else {
+                        // Hide highlights
+                        svg.select('#front-layer')
+                            .attr('visibility', 'hidden');
+
+                        // Change toggle background color
+                        d3.select('.toggle-pc')
+                            .style('background', 'silver');
+                    }
+                });
+            
+            // Create Show/Hide toggle button label
+            d3.select('body')
+                .append('label')
+                .attr('for', 'switch-pc')
+                .attr('class', 'toggle-pc')
+                .style('background', HIGHLIGHT_COLOR)
+                .on('mouseover', function(){
+                    // Show the description and the rectangle behind it
+                    btnDesc.transition()
+                        .duration(300)
+                        .ease(d3.easeExpOut)
+                        .attr('startOffset', 0);
+                    
+                    btnDescRect.transition()
+                        .duration(300)
+                        .ease(d3.easeExpOut)
+                        .attr('width', descWidth);
+                })
+                .on('mouseout', function(){
+                    // Hide the description and the rectangle behind it
+                    btnDesc.transition()
+                        .duration(300)
+                        .ease(d3.easeExpOut)
+                        .attr('startOffset', -descWidth);
+
+                    btnDescRect.transition()
+                        .duration(300)
+                        .ease(d3.easeExpOut)
+                        .attr('width', 0);
+                });
+        }
 
         // Click the Fit button
         d3.select('#fit-button').node().click();
