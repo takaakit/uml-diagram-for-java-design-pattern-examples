@@ -40,7 +40,7 @@ Links
 
 Licence
 ---
-Diagram Map file (DiagramMap.html) includes following libraries:
+Diagram Map file (DiagramMap.html) includes the following libraries:
 * [D3 library](https://d3js.org) is copyrighted by Mike Bostock and is released under the [BSD license](https://opensource.org/licenses/BSD-3-Clause).
 * [Popper library](https://popper.js.org/) is copyrighted by Federico Zivolo and is released under the [MIT license](https://opensource.org/licenses/MIT).
 * [Tippy library](https://atomiks.github.io/tippyjs/) is copyrighted by atomiks and is released under the [MIT license](https://opensource.org/licenses/MIT).
