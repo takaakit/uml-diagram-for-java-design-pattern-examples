@@ -1,7 +1,8 @@
 UML Diagram for Java Design Pattern Examples
 ===
 
-This project lists UML diagrams of the "[Design Pattern Examples in Java](https://github.com/takaakit/design-pattern-examples-in-java)". When you click on a diagram image below, the diagram will be opened in <b>Diagram Map</b>. If you want to know about <b>Diagram Map</b>, please see [this page](https://sites.google.com/view/m-plus-plugin/usage#h.p_Auh2A9HMlSSM).
+This project lists UML diagrams of the "[Design Pattern Examples in Java](https://github.com/takaakit/design-pattern-examples-in-java)". When you click on a diagram image below, the diagram will be opened in <b>Diagram Map</b>. If you want to know about <b>Diagram Map</b>, please see the post below.  
+[https://dev.to/takaakit/diagram-map-tracing-uml-sysml-elements-across-diagrams-49i7](https://dev.to/takaakit/diagram-map-tracing-uml-sysml-elements-across-diagrams-49i7)
 
 Behavioral Patterns
 ---
